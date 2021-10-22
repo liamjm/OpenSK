@@ -659,7 +659,10 @@ class OpenSKInstaller:
       # Install padding and application if needed
       if self.args.application:
         self.install_padding()
-        self.install_tab_file("target/tab/{}.tab".format(self.args.application))
+        tab_filename = self.args.app_file
+        if not tab_filename:
+            tab_filename = "target/tab/{}.tab".format(self.args.application)
+        self.install_tab_file(tab_filename)
         if self.verify_flashed_app(self.args.application):
           info("You're all set!")
           return 0
@@ -927,6 +930,13 @@ if __name__ == "__main__":
       dest="kernel_file",
       default=None,
       help=("When set, this file is flashed, rather than building an imagine in thi script."),
+  )
+
+  main_parser.add_argument(
+      "--app_file",
+      dest="app_file",
+      default=None,
+      help=("When set, this file is used as the application tab file, rather than building an image in this script."),
   )
 
   main_parser.set_defaults(features=["with_ctap1"])
