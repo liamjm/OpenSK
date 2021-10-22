@@ -439,7 +439,7 @@ class OpenSKInstaller:
 
   def install_tab_file(self, tab_filename):
     assert self.args.application
-    info("Installing Tock application {}".format(self.args.application))
+    info("Installing Tock application {} from {}".format(self.args.application, tab_filename))
     board_props = SUPPORTED_BOARDS[self.args.board]
     args = copy.copy(self.tockloader_default_args)
     setattr(args, "app_address", board_props.app_address)
@@ -463,9 +463,13 @@ class OpenSKInstaller:
 
   def install_tock_os(self):
     board_props = SUPPORTED_BOARDS[self.args.board]
-    kernel_file = os.path.join("third_party", "tock", "target",
-                               board_props.arch, "release",
-                               "{}.bin".format(self.args.board))
+    if self.args.kernel_file:
+        kernel_file = self.args.kernel_file
+    else:
+        kernel_file = os.path.join("third_party", "tock", "target",
+                                   board_props.arch, "release",
+                                   "{}.bin".format(self.args.board))
+    #kernel_file = "/home/liamjm/dev/opensk/nrf52840dk.bin"
     info("Flashing file {}.".format(kernel_file))
     with open(kernel_file, "rb") as f:
       kernel = f.read()
@@ -633,7 +637,7 @@ class OpenSKInstaller:
 
     if self.args.application == "ctap2":
       self.generate_crypto_materials(self.args.regenerate_keys)
-      self.build_opensk()
+      #self.build_opensk()
     elif self.args.application is None:
       info("No application selected.")
     else:
@@ -916,6 +920,13 @@ if __name__ == "__main__":
       dest="elf2tab_output",
       default=None,
       help=("When set, the output of elf2tab is appended to this file."),
+  )
+
+  main_parser.add_argument(
+      "--kernel_file",
+      dest="kernel_file",
+      default=None,
+      help=("When set, this file is flashed, rather than building an imagine in thi script."),
   )
 
   main_parser.set_defaults(features=["with_ctap1"])
