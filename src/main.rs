@@ -147,10 +147,14 @@ fn main() {
                         #[cfg(feature = "debug_ctap")]
                         print_packet_notice("Sent packet", &clock);
                     }
-                    usb_ctap_hid::SendOrRecvStatus::Received(_) => {
-                        #[cfg(feature = "debug_ctap")]
+                    usb_ctap_hid::SendOrRecvStatus::Received(rx_endpoint) => {
+                      #[cfg(feature = "debug_ctap")]
                         print_packet_notice("Received an UNEXPECTED packet", &clock);
                         // TODO: handle this unexpected packet.
+                        writeln!(
+                          Console::new(),
+                          "Received packet on {}, 'sent' {}", rx_endpoint as usize, endpoint as usize)
+                      .unwrap();
                     }
                 }
             }
